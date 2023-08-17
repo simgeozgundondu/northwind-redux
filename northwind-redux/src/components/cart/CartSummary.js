@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 import {
   UncontrolledDropdown,
   DropdownToggle,
@@ -6,47 +8,46 @@ import {
   DropdownItem,
   NavItem,
   NavLink,
-  Badge
+  Badge,
 } from "reactstrap";
-import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import * as cartActions from "../../redux/actions/cartActions";
-import {Link} from "react-router-dom"
+import * as cartActions from "../../redux/actions/cartActions"
 import alertify from "alertifyjs"
 
 class CartSummary extends Component {
-  removeFromCart(product) {
-    this.props.actions.removeFromCart(product);
-    alertify.error(product.productName + " sepetten silindi")
-  }
+    
   renderEmpty() {
     return (
       <NavItem>
-        <NavLink>Sepetiniz boş</NavLink>
+        <NavLink>Empty Cart</NavLink>
       </NavItem>
     );
+  }
+  removeFromCart=cartItem=>{
+    this.props.actions.removeFromCart(cartItem.product)
+    alertify.error(cartItem.product.productName+" removed from Cart!");
   }
   renderSummary() {
     return (
       <UncontrolledDropdown nav inNavbar>
         <DropdownToggle nav caret>
-          Sepetiniz
+          Your Cart
         </DropdownToggle>
         <DropdownMenu right>
-          {this.props.cart.map(cartItem => (
+          {this.props.cart.map((cartItem) => (
             <DropdownItem key={cartItem.product.id}>
-              <Badge color="danger" onClick={()=>this.removeFromCart(cartItem.product)}>-</Badge>
+                <Badge color="danger" onClick={()=> this.removeFromCart(cartItem)}>x</Badge>
               {cartItem.product.productName}
               <Badge color="success">{cartItem.quantity}</Badge>
             </DropdownItem>
           ))}
-
           <DropdownItem divider />
-          <DropdownItem><Link to={"/cart"}>Sepete git</Link></DropdownItem>
+          <DropdownItem ><Link to={"/cart"}>Go to cart</Link></DropdownItem>
         </DropdownMenu>
       </UncontrolledDropdown>
     );
   }
+ 
   render() {
     return (
       <div>
@@ -55,20 +56,17 @@ class CartSummary extends Component {
     );
   }
 }
-
 function mapDispatchToProps(dispatch) {
   return {
     actions: {
-      removeFromCart: bindActionCreators(cartActions.removeFromCart, dispatch)
-    }
+      removeFromCart: bindActionCreators(cartActions.removeFromCart, dispatch),
+    },
   };
 }
-function mapStateToProps(state) {
+
+function mapStateProps(state) {
   return {
-    cart: state.cartReducer
+    cart: state.cartReducer,
   };
 }
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CartSummary);
+export default connect(mapStateProps,mapDispatchToProps)(CartSummary);

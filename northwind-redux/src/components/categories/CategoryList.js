@@ -2,18 +2,17 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as categoryActions from "../../redux/actions/categoryActions";
-import { ListGroup, ListGroupItem } from "reactstrap";
-import { Badge } from "reactstrap";
 import * as productActions from "../../redux/actions/productActions";
+import { ListGroup, ListGroupItem, Badge } from "reactstrap";
 
 class CategoryList extends Component {
   componentDidMount() {
     this.props.actions.getCategories();
   }
 
-  selectCategory = category => {
+  selectCategory = (category) => {
     this.props.actions.changeCategory(category);
-    this.props.actions.getProducts(category.id)
+    this.props.actions.getProducts(category.id);
   };
 
   render() {
@@ -23,9 +22,11 @@ class CategoryList extends Component {
           <Badge color="warning">Categories</Badge>
         </h3>
         <ListGroup>
-          {this.props.categories.map(category => (
+          {this.props.categories.map((category) => (
             <ListGroupItem
-              active={category.id === this.props.currentCategory.id}
+              active={
+                category.id === this.props.currentCategory.id ? true : false
+              }
               onClick={() => this.selectCategory(category)}
               key={category.id}
             >
@@ -38,14 +39,14 @@ class CategoryList extends Component {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateProps(state) {
   return {
     currentCategory: state.changeCategoryReducer,
-    categories: state.categoryListReducer
+    categories: state.categoryListReducer,
   };
 }
 
-function mapDispatchToProps(dispatch) {
+function mapDispatchProps(dispatch) {
   return {
     actions: {
       getCategories: bindActionCreators(
@@ -56,12 +57,12 @@ function mapDispatchToProps(dispatch) {
         categoryActions.changeCategory,
         dispatch
       ),
-      getProducts: bindActionCreators(productActions.getProducts, dispatch)
-    }
+      getProducts: bindActionCreators(
+        productActions.getProducts, 
+        dispatch
+      ),
+    },
   };
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(CategoryList);
+export default connect(mapStateProps, mapDispatchProps)(CategoryList);
